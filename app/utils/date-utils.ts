@@ -1,3 +1,5 @@
+import type { Measurement } from './types';
+
 export const MONTH_NAMES = [
   'januar',
   'februar',
@@ -96,3 +98,25 @@ export function countUniqueDays(dates: Date[]): number {
     ) + 1
   );
 }
+
+export const cacheIsUpToDate = (
+  month: MonthName,
+  measurements: Measurement[]
+): boolean => {
+  const { numDays } = getMonthQueryInfo(month);
+  if (numDays * 24 === measurements.length) {
+    return true;
+  }
+  const lastMeasurement = measurements[measurements.length - 1];
+  const lastFrom = new Date(lastMeasurement.from);
+  const lastTo = new Date(lastMeasurement.to);
+  if (lastTo.getMonth() !== lastFrom.getMonth()) {
+    return true;
+  }
+  const current = new Date();
+  const TWO_HOURS = 1000 * 60 * 60 * 2;
+  if (current.getTime() < lastTo.getTime() + TWO_HOURS) {
+    return true;
+  }
+  return false;
+};

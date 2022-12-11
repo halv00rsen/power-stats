@@ -1,6 +1,7 @@
 import { btoa } from '@remix-run/node/dist/base64';
 import { getCachedMeasurements, saveCache } from './cache.server';
 import type { MonthName } from './date-utils';
+import { cacheIsUpToDate } from './date-utils';
 import { getMonthIndex, getMonthQueryInfo } from './date-utils';
 import type { Measurement } from './types';
 
@@ -83,11 +84,16 @@ const getDataForMonth = async (month: MonthName) => {
     btoa(date.toISOString())
   );
   const cached = await getCachedMeasurements(month);
-  if (cached && cached.length > 0) {
+  if (cached && cached.length > 0 && cacheIsUpToDate(month, cached)) {
+    console.log(`Using cache for ${month}`);
     return cached;
   }
-  const measurements = await getMeasurements(query);
+  console.log(`Fetching new measurements for ${month}`);
+  const measurements = (await getMeasurements(query)).filter(
+    ({ cost, consumption }) => cost != null && consumption != null
+  );
   saveCache(month, measurements);
+
   return measurements;
 };
 

@@ -4,6 +4,12 @@ import { getMonthlyInformation } from '~/utils/strom-utils';
 import styles from './MonthComponent.css';
 import { countUniqueDays } from '~/utils/date-utils';
 
+const getLastRegisteredHour = (
+  measurements: Measurement[]
+): Measurement => {
+  return measurements[measurements.length - 1];
+};
+
 const getDayString = (measurement: Measurement) => {
   const date = new Date(measurement.from);
   return `${date.getFullYear()}-${
@@ -102,6 +108,10 @@ export const MonthComponent = ({ month }: Props) => {
     month.measurements.map(({ from }) => new Date(from))
   );
 
+  const lastRegisteredMeasurement = getLastRegisteredHour(
+    month.measurements
+  );
+
   return (
     <div
       className="wrapper"
@@ -111,17 +121,24 @@ export const MonthComponent = ({ month }: Props) => {
       }}
     >
       <section>
+        <h3>Strømforbruk for {monthName}</h3>
         <dl>
+          <dd></dd>
           <dt>
-            <h3>Strømforbruk for {monthName}</h3>
+            <strong>Kostnad for {monthName}</strong>
           </dt>
           <dd>
-            {Math.round(consumption)} {consumptionUnit}
+            {Math.round(cost)} kroner ({Math.round(consumption)}{' '}
+            {consumptionUnit})
           </dd>
           <dt>
-            <h3>Kostnad for {monthName}</h3>
+            <strong>Data frem til</strong>
           </dt>
-          <dd>{Math.round(cost)} kroner</dd>
+          <dd>
+            {new Date(lastRegisteredMeasurement.to).toLocaleString(
+              'no-NB'
+            )}
+          </dd>
         </dl>
       </section>
 

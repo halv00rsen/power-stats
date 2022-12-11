@@ -25,7 +25,7 @@ export const saveCache = async (
   month: MonthName,
   measurements: Measurement[]
 ) => {
-  db.measurement.deleteMany({
+  await db.measurement.deleteMany({
     where: { month },
   });
   for (let i = 0; i < measurements.length; i++) {
