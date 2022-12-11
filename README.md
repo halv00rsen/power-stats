@@ -1,5 +1,9 @@
 
-# Tibber Stats
+# Power Stats
+
+Simple application for seeing statistics for your Tibber subscription.
+
+Lists estimated costs, "strømstøtte", price and consume per day.
 
 ## Development
 
