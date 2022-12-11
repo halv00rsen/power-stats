@@ -113,13 +113,7 @@ export const MonthComponent = ({ month }: Props) => {
   );
 
   return (
-    <div
-      className="wrapper"
-      style={{
-        fontFamily: 'system-ui, sans-serif',
-        lineHeight: '1.4',
-      }}
-    >
+    <div className="wrapper">
       <section>
         <h3>Strømforbruk for {monthName}</h3>
         <dl>

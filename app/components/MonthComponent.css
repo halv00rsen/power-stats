@@ -8,8 +8,18 @@ th {
 
 .wrapper {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto;
   column-gap: 1.5em;
+}
+
+@media only screen and (min-width: 600px) {
+  .wrapper {
+    grid-template-columns: auto auto;
+  }
+
+  .day-overview {
+    grid-column: 1 / span 2;
+  }
 }
 
 .spotpriser {
@@ -46,11 +56,6 @@ th {
 .container > dd:nth-child(4n + 4) {
   background-color: white;
 }
-
-.day-overview {
-  grid-column: 1 / span 2;
-}
-
 .red {
   background-color: rgb(255, 208, 208);
 }
