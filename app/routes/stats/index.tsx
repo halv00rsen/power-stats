@@ -15,7 +15,6 @@ import {
   links as monthStyles,
 } from '~/components/MonthComponent';
 import {
-  getMonthIndex,
   getMonthName,
   isValidMonth,
   MONTH_NAMES,
@@ -77,19 +76,8 @@ export async function loader({ request }: LoaderArgs) {
   }
 
   if (month && isValidMonth(month)) {
-    try {
-      const data = await getCurrentMonthConsumption(month);
-      return json({ data, type: 'success' });
-    } catch {
-      return json({
-        type: 'success',
-        data: {
-          monthName: month,
-          month: getMonthIndex(month),
-          measurements: [],
-        },
-      });
-    }
+    const data = await getCurrentMonthConsumption(month);
+    return json({ data, type: 'success' });
   }
   return json(
     { type: 'error' },

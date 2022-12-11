@@ -1,3 +1,4 @@
+import { Response } from '@remix-run/node';
 import { btoa } from '@remix-run/node/dist/base64';
 import { getCachedMeasurements, saveCache } from './cache.server';
 import type { MonthName } from './date-utils';
@@ -9,6 +10,12 @@ const tibberEndpointGraphQl = 'https://api.tibber.com/v1-beta/gql';
 const accessKey = process.env.TIBBER_ACCESS_KEY;
 
 async function getTibberData<Type>(query: string): Promise<Type> {
+  if (!accessKey) {
+    throw new Response(
+      'Server is misconfigured. Missing access token for Tibber',
+      { status: 500 }
+    );
+  }
   const request = await fetch(tibberEndpointGraphQl, {
     body: JSON.stringify({ query }),
     headers: {
@@ -106,6 +113,12 @@ export interface MonthConsumption {
 export async function getCurrentMonthConsumption(
   monthName: MonthName
 ): Promise<MonthConsumption> {
+  if (!accessKey) {
+    throw new Response(
+      'Server is misconfigured. Missing access token for Tibber',
+      { status: 500 }
+    );
+  }
   return {
     month: getMonthIndex(monthName),
     monthName,
