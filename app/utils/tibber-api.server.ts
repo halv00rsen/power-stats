@@ -6,6 +6,8 @@ import { cacheIsUpToDate } from './date-utils';
 import { getMonthIndex, getMonthQueryInfo } from './date-utils';
 import type { Measurement } from './types';
 
+const tibberFetchTimeout = 10000;
+
 const tibberEndpointGraphQl = 'https://api.tibber.com/v1-beta/gql';
 const accessKey = process.env.TIBBER_ACCESS_KEY;
 
@@ -23,7 +25,14 @@ async function getTibberData<Type>(query: string): Promise<Type> {
       Authorization: `Bearer ${accessKey}`,
     },
     method: 'POST',
+    signal: AbortSignal.timeout(tibberFetchTimeout),
   });
+  if (!request.ok) {
+    throw new Response('Error fetching data from Tibber', {
+      status: request.status,
+      statusText: request.statusText,
+    });
+  }
   const { data } = await request.json();
   return data;
 }
