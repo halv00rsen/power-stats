@@ -52,7 +52,6 @@ const isAuthorized = (request: LoaderArgs['request']) => {
 export const headers: HeadersFunction = () => {
   return {
     'WWW-Authenticate': 'Basic',
-    'custom-header': 'somehtig',
   };
 };
 
