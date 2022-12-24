@@ -12,7 +12,7 @@ th {
   column-gap: 1.5em;
 }
 
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 650px) {
   .wrapper {
     grid-template-columns: auto auto;
   }
@@ -20,14 +20,16 @@ th {
   .day-overview {
     grid-column: 1 / span 2;
   }
-}
+  .spotpriser {
+    max-width: 500px;
+  }
 
-.spotpriser {
-  max-width: 500px;
+  .container {
+    max-width: 500px;
+  }
 }
 
 .container {
-  max-width: 500px;
   display: grid;
   grid-template-columns: auto auto;
 }
