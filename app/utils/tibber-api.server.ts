@@ -53,11 +53,19 @@ interface ConsumptionResponse {
   };
 }
 
-function buildConsumptionQuery(numHours: number, after: string) {
+function buildConsumptionQuery({
+  numDays,
+  after,
+}: {
+  numDays: number;
+  after: Date;
+}) {
+  const encodedDate = btoa(after.toISOString());
+  const numHours = numDays * 24;
   return `{
     viewer {
       homes {
-        consumption(resolution: HOURLY, first: ${numHours}, after: "${after}") {
+        consumption(resolution: HOURLY, first: ${numHours}, after: "${encodedDate}") {
           nodes {
             from
             to
@@ -85,11 +93,7 @@ const getMeasurements = async (
 };
 
 const getDataForMonth = async (month: MonthName) => {
-  const { date, numDays } = getMonthQueryInfo(month);
-  const query = buildConsumptionQuery(
-    numDays * 24,
-    btoa(date.toISOString())
-  );
+  const query = buildConsumptionQuery(getMonthQueryInfo(month));
   const cached = await getCachedMeasurements(month);
   if (cached && cached.length > 0 && cacheIsUpToDate(month, cached)) {
     console.log(`Using cache for ${month}`);

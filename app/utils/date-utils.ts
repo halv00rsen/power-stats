@@ -34,19 +34,20 @@ export const isValidMonth = (month: string): month is MonthName => {
 // because of Tibbers API not including hour from the 'after' keyword
 export const getMonthQueryInfo = (
   month: MonthName
-): { date: Date; numDays: number } => {
+): { after: Date; numDays: number } => {
   const current = new Date();
-  const requestedMonthIndex = getMonthIndex(month);
+  const monthIndex = getMonthIndex(month);
   const year = current.getFullYear();
-  if (requestedMonthIndex === MONTH_NAMES.indexOf('januar')) {
+  if (monthIndex === MONTH_NAMES.indexOf('januar')) {
     return {
-      date: new Date(`${year - 1}-12-31T23:00`),
+      after: new Date(`${year - 1}-12-31T23:00`),
       numDays: getDaysInMonth({ year, monthNotZeroIndexed: 1 }),
     };
   }
-  const lastMonthNotPadded = requestedMonthIndex;
+  const lastMonthNotPadded = monthIndex;
+  const nextMonthNotPadded = monthIndex + 1;
   const daysInLastMonth = getDaysInMonth({
-    monthNotZeroIndexed: requestedMonthIndex,
+    monthNotZeroIndexed: lastMonthNotPadded,
     year: year,
   });
   const dateString =
@@ -54,10 +55,10 @@ export const getMonthQueryInfo = (
       ? `${year}-0${lastMonthNotPadded}-${daysInLastMonth}T23:00`
       : `${year}-${lastMonthNotPadded}-${daysInLastMonth}T23:00`;
   return {
-    date: new Date(dateString),
+    after: new Date(dateString),
     numDays: getDaysInMonth({
       year,
-      monthNotZeroIndexed: requestedMonthIndex + 1,
+      monthNotZeroIndexed: nextMonthNotPadded,
     }),
   };
 };

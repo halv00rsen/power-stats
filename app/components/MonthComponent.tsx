@@ -157,11 +157,6 @@ export const MonthComponent = ({ month }: Props) => {
               <td>{oerePerKwh(utenPaaslag / consumption)}</td>
               <td>{oerePerKwh((utenPaaslag / consumption) * 0.8)}</td>
             </tr>
-            <tr>
-              <td>"Spotpris stønad"</td>
-              <td></td>
-              <td></td>
-            </tr>
           </tbody>
         </table>
       </section>

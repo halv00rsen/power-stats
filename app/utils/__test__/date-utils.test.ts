@@ -10,34 +10,34 @@ describe('getMonthQueryInfo', () => {
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
 
   test('januar', () => {
-    const { date, numDays } = getMonthQueryInfo('januar');
+    const { after, numDays } = getMonthQueryInfo('januar');
     expect(numDays).toBe(31);
-    expect(date.getFullYear()).toBe(2019);
-    expect(date.getMonth()).toBe(getMonthIndex('desember'));
+    expect(after.getFullYear()).toBe(2019);
+    expect(after.getMonth()).toBe(getMonthIndex('desember'));
   });
 
   test('february with leap year', () => {
-    const { date, numDays } = getMonthQueryInfo('februar');
+    const { after, numDays } = getMonthQueryInfo('februar');
     expect(numDays).toBe(29);
-    expect(date.getMonth()).toBe(getMonthIndex('januar'));
+    expect(after.getMonth()).toBe(getMonthIndex('januar'));
   });
 
   test('oktober', () => {
-    const { date, numDays } = getMonthQueryInfo('oktober');
+    const { after, numDays } = getMonthQueryInfo('oktober');
     expect(numDays).toBe(31);
-    expect(date.getMonth()).toBe(getMonthIndex('september'));
+    expect(after.getMonth()).toBe(getMonthIndex('september'));
   });
 
   test('november', () => {
-    const { date, numDays } = getMonthQueryInfo('november');
+    const { after, numDays } = getMonthQueryInfo('november');
     expect(numDays).toBe(30);
-    expect(date.getMonth()).toBe(getMonthIndex('oktober'));
+    expect(after.getMonth()).toBe(getMonthIndex('oktober'));
   });
 
   test('november', () => {
-    const { date, numDays } = getMonthQueryInfo('desember');
+    const { after, numDays } = getMonthQueryInfo('desember');
     expect(numDays).toBe(31);
-    expect(date.getMonth()).toBe(getMonthIndex('november'));
+    expect(after.getMonth()).toBe(getMonthIndex('november'));
   });
 });
 
