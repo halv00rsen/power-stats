@@ -1,9 +1,20 @@
 table {
   width: 100%;
+  border-spacing: 0;
 }
 
-th {
-  text-align: start;
+td:first-child {
+  text-align: left;
+}
+
+th,
+td {
+  text-align: right;
+  padding-right: 0.5em;
+}
+
+tr:nth-child(2n) {
+  background-color: rgb(239, 239, 239);
 }
 
 .wrapper {
@@ -58,6 +69,7 @@ th {
 .container > dd:nth-child(4n + 4) {
   background-color: white;
 }
+
 .red {
   background-color: rgb(255, 208, 208);
 }
