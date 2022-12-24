@@ -10,11 +10,24 @@ const getLastRegisteredHour = (
   return measurements[measurements.length - 1];
 };
 
+const padWithZero = (num: number): string => {
+  if (num > 99) {
+    throw new Error(
+      'pad with zero not supported for numbers with three digits'
+    );
+  }
+  if (num < 10) {
+    return `0${num}`;
+  }
+  return `${num}`;
+};
+
 const getDayString = (measurement: Measurement) => {
   const date = new Date(measurement.from);
-  return `${date.getFullYear()}-${
-    date.getMonth() + 1
-  }-${date.getDate()}`;
+  const year = date.getFullYear();
+  const month = padWithZero(date.getMonth() + 1);
+  const day = padWithZero(date.getDate());
+  return `${year}-${month}-${day}`;
 };
 
 const countByDay = (measurements: Measurement[]) => {
@@ -226,24 +239,28 @@ export const MonthComponent = ({ month }: Props) => {
             </tr>
           </thead>
           <tbody>
-            {countByDay(month.measurements).map((entry) => {
-              const estimatedAllowance = Math.round(
-                (spotWithoutMva - 0.7) * 0.9 * entry.usage * 1.25
-              );
-              const diff = entry.cost - estimatedAllowance;
-              return (
-                <tr key={entry.date}>
-                  <td>{entry.date}</td>
-                  <td>{getKr(entry.cost)}</td>
-                  <td>{Math.round(entry.usage)} kwh</td>
-                  <td>{oerePerKwh(entry.cost / entry.usage)}</td>
-                  <td>{getKr(estimatedAllowance)}</td>
-                  <td className={diff > 0 ? 'red' : 'green'}>
-                    {getKr(diff)}
-                  </td>
-                </tr>
-              );
-            })}
+            {countByDay(month.measurements)
+              .sort((one, two) => {
+                return one.date < two.date ? 1 : -1;
+              })
+              .map((entry) => {
+                const estimatedAllowance = Math.round(
+                  (spotWithoutMva - 0.7) * 0.9 * entry.usage * 1.25
+                );
+                const diff = entry.cost - estimatedAllowance;
+                return (
+                  <tr key={entry.date}>
+                    <td>{entry.date}</td>
+                    <td>{getKr(entry.cost)}</td>
+                    <td>{Math.round(entry.usage)} kwh</td>
+                    <td>{oerePerKwh(entry.cost / entry.usage)}</td>
+                    <td>{getKr(estimatedAllowance)}</td>
+                    <td className={diff > 0 ? 'red' : 'green'}>
+                      {getKr(diff)}
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </section>
