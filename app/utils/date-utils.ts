@@ -121,3 +121,23 @@ export const cacheIsUpToDate = (
   }
   return false;
 };
+
+const padWithZero = (num: number): string => {
+  if (num > 99) {
+    throw new Error(
+      'pad with zero not supported for numbers with three digits'
+    );
+  }
+  if (num < 10) {
+    return `0${num}`;
+  }
+  return `${num}`;
+};
+
+export const getFullDateString = (dateString: string): string => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = padWithZero(date.getMonth() + 1);
+  const day = padWithZero(date.getDate());
+  return `${year}-${month}-${day}`;
+};
