@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import type { Measurement, Month } from '~/utils/types';
+import { YearDiff } from '~/utils/date-utils';
 import type { LinksFunction } from '@remix-run/node';
 import {
   getMonthlyInformation,
@@ -21,9 +23,10 @@ export const links: LinksFunction = () => {
 
 interface Props {
   month: Month;
+  year: YearDiff
 }
 
-export const MonthComponent = ({ month }: Props) => {
+export const MonthComponent = ({ month, year }: Props) => {
   const { monthName } = month;
 
   const {
@@ -134,7 +137,8 @@ export const MonthComponent = ({ month }: Props) => {
         <dl className="container">
           <dt>Kost</dt>
           <dd>
-            {toKronerPostfix(totalCost.rawValue / numDaysCounted)}
+            { }
+            {toKronerPostfix(cost.rawValue / numDaysCounted)}
           </dd>
         </dl>
       </section>

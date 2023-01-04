@@ -15,11 +15,37 @@ export const MONTH_NAMES = [
   'desember',
 ] as const;
 
+
+export const YEAR_NUMBERS = [
+  0, // 2023
+  1, // 2022
+  2, // 2021
+  3, // 2020
+] as const;
+
 export type MonthName = typeof MONTH_NAMES[number];
+export type YearDiff = 0 | 1 | 2 | 3
+export type FullYear = '2020' | '2021' | '2022' | '2023'
 
 export const getMonthName = (date: Date) => {
   return MONTH_NAMES[date.getMonth()];
 };
+export const yearDiffToYear = (yearNum: YearDiff): FullYear => {
+  switch (yearNum) {
+    case 0:
+      return "2023"
+    case 1:
+      return "2022"
+
+    case 2:
+      return "2021"
+
+    case 3:
+      return "2020"
+  }
+
+
+}
 
 export const getMonthIndex = (month: MonthName): number =>
   MONTH_NAMES.indexOf(month);
@@ -33,14 +59,15 @@ export const isValidMonth = (month: string): month is MonthName => {
 // Example, oktober would yield 2022-09-30T23:00 instead of 2022-10-01T00:00
 // because of Tibbers API not including hour from the 'after' keyword
 export const getMonthQueryInfo = (
-  month: MonthName
+  month: MonthName,
+  yearNum: YearDiff
 ): { after: Date; numDays: number } => {
   const current = new Date();
   const monthIndex = getMonthIndex(month);
-  const year = current.getFullYear();
+  const year = current.getFullYear() - yearNum
   if (monthIndex === MONTH_NAMES.indexOf('januar')) {
     return {
-      after: new Date(`${year - 1}-12-31T23:00`),
+      after: new Date(`${year}-12-31T23:00`),
       numDays: getDaysInMonth({ year, monthNotZeroIndexed: 1 }),
     };
   }
@@ -102,9 +129,10 @@ export function countUniqueDays(dates: Date[]): number {
 
 export const cacheIsUpToDate = (
   month: MonthName,
-  measurements: Measurement[]
+  measurements: Measurement[],
+  yearNum: YearDiff
 ): boolean => {
-  const { numDays } = getMonthQueryInfo(month);
+  const { numDays } = getMonthQueryInfo(month, yearNum);
   if (numDays * 24 === measurements.length) {
     return true;
   }
