@@ -1,7 +1,7 @@
 import { Response } from '@remix-run/node';
 import { btoa } from '@remix-run/node/dist/base64';
 import { getCachedMeasurements, saveCache } from './cache.server';
-import type { MonthName } from './date-utils';
+import { FullYear, MonthName, YearDiff, yearDiffToYear } from './date-utils';
 import { cacheIsUpToDate } from './date-utils';
 import { getMonthIndex, getMonthQueryInfo } from './date-utils';
 import type { Measurement } from './types';
@@ -101,30 +101,34 @@ const getMeasurements = async (
   return [];
 };
 
-const getDataForMonth = async (month: MonthName) => {
-  const query = buildConsumptionQuery(getMonthQueryInfo(month));
-  const cached = await getCachedMeasurements(month);
-  if (cached && cached.length > 0 && cacheIsUpToDate(month, cached)) {
-    console.log(`Using cache for ${month}`);
+const getDataForMonth = async (month: MonthName, yearNum: YearDiff) => {
+  const query = buildConsumptionQuery(getMonthQueryInfo(month, yearNum));
+  const cached = await getCachedMeasurements(month, yearNum);
+  let fullYear: FullYear = yearDiffToYear(yearNum)
+  if (cached && cached.length > 0 && cacheIsUpToDate(month, cached, yearNum)) {
+    console.log(`Using cache for ${month} ${fullYear}`);
     return cached;
   }
-  console.log(`Fetching new measurements for ${month}`);
+  console.log(`Fetching new measurements for ${month} ${fullYear}`);
   const measurements = (await getMeasurements(query)).filter(
     ({ cost, consumption }) => cost != null && consumption != null
   );
-  saveCache(month, measurements);
+
+  saveCache(month, measurements, yearNum);
 
   return measurements;
 };
 
 export interface MonthConsumption {
+  year: YearDiff,
   month: number;
   monthName: string;
   measurements: Measurement[];
 }
 
 export async function getCurrentMonthConsumption(
-  monthName: MonthName
+  monthName: MonthName,
+  year: YearDiff
 ): Promise<MonthConsumption> {
   if (!accessKey) {
     throw new Response(
@@ -133,8 +137,9 @@ export async function getCurrentMonthConsumption(
     );
   }
   return {
+    year,
     month: getMonthIndex(monthName),
     monthName,
-    measurements: await getDataForMonth(monthName),
+    measurements: await getDataForMonth(monthName, year),
   };
 }

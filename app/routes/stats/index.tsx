@@ -18,9 +18,12 @@ import {
   getMonthName,
   isValidMonth,
   MONTH_NAMES,
+  yearDiffToYear,
+  YEAR_NUMBERS,
 } from '~/utils/date-utils';
 import type { MonthConsumption } from '~/utils/tibber-api.server';
 import { getCurrentMonthConsumption } from '~/utils/tibber-api.server';
+import type { YearDiff } from '~/utils/date-utils';
 
 const isAuthorized = (request: LoaderArgs['request']) => {
   const header = request.headers.get('Authorization');
@@ -63,6 +66,7 @@ export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
   const month =
     url.searchParams.get('month') || getMonthName(new Date());
+  const yearNum = Number(url.searchParams.get('year')) as YearDiff || 0
 
   if (!isAuthorized(request)) {
     return json(
@@ -75,7 +79,7 @@ export async function loader({ request }: LoaderArgs) {
   }
 
   if (month && isValidMonth(month)) {
-    const data = await getCurrentMonthConsumption(month);
+    const data = await getCurrentMonthConsumption(month, yearNum);
     return json({ data, type: 'success' });
   }
   return json(
@@ -89,7 +93,7 @@ export async function loader({ request }: LoaderArgs) {
 
 const isMonthResponse = (
   data: unknown
-): data is { type: 'success'; data: MonthConsumption } => {
+): data is { type: 'success'; data: MonthConsumption, year: YearDiff } => {
   return (data as { type: string }).type === 'success';
 };
 
@@ -102,14 +106,14 @@ export default function Index() {
     return <div>En feil skjedde</div>;
   }
 
-  const { data: month } = loaderData;
-
+  const { data, data: month, year } = loaderData;
   return (
     <div>
       <Form
         method="get"
         onChange={(event) => submit(event.currentTarget)}
       >
+
         <select
           name="month"
           defaultValue={month.monthName}
@@ -120,6 +124,19 @@ export default function Index() {
               {monthName}
             </option>
           ))}
+        </select>
+
+        <select
+          name="year"
+          defaultValue={0}
+          disabled={transition.state !== 'idle'}
+        >
+          {YEAR_NUMBERS.map((year, idx) => (
+            <option key={idx} value={year}>
+              {yearDiffToYear(year)}
+            </option>
+          ))}
+
         </select>
       </Form>
       {month.measurements.length === 0 ? (
