@@ -46,7 +46,7 @@ export const MonthComponent = ({ month }: Props) => {
     month.measurements
   );
 
-  const year = new Date(month.month).getFullYear()
+  const year = new Date(month.measurements[2].from).getFullYear()
   return (
     <div className="wrapper">
       <section>
