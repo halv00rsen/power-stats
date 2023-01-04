@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { Measurement, Month } from '~/utils/types';
-import { YearDiff } from '~/utils/date-utils';
+import { FullYear, YearDiff, yearDiffToYear } from '~/utils/date-utils';
 import type { LinksFunction } from '@remix-run/node';
 import {
   getMonthlyInformation,
@@ -23,10 +23,9 @@ export const links: LinksFunction = () => {
 
 interface Props {
   month: Month;
-  year: YearDiff
 }
 
-export const MonthComponent = ({ month, year }: Props) => {
+export const MonthComponent = ({ month }: Props) => {
   const { monthName } = month;
 
   const {
@@ -47,10 +46,11 @@ export const MonthComponent = ({ month, year }: Props) => {
     month.measurements
   );
 
+  const year = new Date(month.month).getFullYear()
   return (
     <div className="wrapper">
       <section>
-        <h3>Strømforbruk for {monthName}</h3>
+        <h3>Strømforbruk for {monthName} {year} </h3>
         <dl>
           <dt>
             <strong>Kostnad for {monthName}</strong>

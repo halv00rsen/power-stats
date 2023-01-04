@@ -106,8 +106,7 @@ export default function Index() {
     return <div>En feil skjedde</div>;
   }
 
-  const { year, data: month } = loaderData;
-
+  const { data, data: month, year } = loaderData;
   return (
     <div>
       <Form
@@ -143,7 +142,7 @@ export default function Index() {
       {month.measurements.length === 0 ? (
         <div>Klarte ikke finne noe data for denne måneden.</div>
       ) : (
-        <MonthComponent month={month} year={year} />
+        <MonthComponent month={month} />
       )}
     </div>
   );
