@@ -13,6 +13,7 @@ Lists estimated costs, "strømstøtte", price and consume per day.
   TIBBER_ACCESS_KEY=<access-key> # can be found at [Tibber docs](https://developer.tibber.com/docs/guides/calling-api)
   USERNAME=<some-username> # For basic auth
   PASSWORD=<some-password> # For basic auth
+  DATABASE_URL="file:./dev.db" # For accessing sqlite db
   ```
 
     Tibber access token can be found at [Tibber docs](https://developer.tibber.com/docs/guides/calling-api).
