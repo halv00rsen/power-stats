@@ -22,6 +22,15 @@ import {
 import type { MonthConsumption } from '~/utils/tibber-api.server';
 import { getCurrentMonthConsumption } from '~/utils/tibber-api.server';
 
+const getValidYears = (): number[] => {
+  const years = [2020];
+  const today = new Date();
+  for (let year = years[0] + 1; year <= today.getFullYear(); year++) {
+    years.push(year);
+  }
+  return years;
+};
+
 const isAuthorized = (request: LoaderArgs['request']) => {
   const header = request.headers.get('Authorization');
 
@@ -60,10 +69,6 @@ export const links: LinksFunction = () => {
 };
 
 export async function loader({ request }: LoaderArgs) {
-  const url = new URL(request.url);
-  const month =
-    url.searchParams.get('month') || getMonthName(new Date());
-
   if (!isAuthorized(request)) {
     return json(
       { type: 'error' },
@@ -73,9 +78,23 @@ export async function loader({ request }: LoaderArgs) {
       }
     );
   }
+  const url = new URL(request.url);
+  const today = new Date();
+  const month = url.searchParams.get('month') || getMonthName(today);
+  const year =
+    parseInt(url.searchParams.get('year') || '') ||
+    today.getFullYear();
 
-  if (month && isValidMonth(month)) {
-    const data = await getCurrentMonthConsumption(month);
+  if (
+    month &&
+    isValidMonth(month) &&
+    !isNaN(year) &&
+    getValidYears().includes(year)
+  ) {
+    const data = await getCurrentMonthConsumption({
+      monthName: month,
+      year,
+    });
     return json({ data, type: 'success' });
   }
   return json(
@@ -118,6 +137,17 @@ export default function Index() {
           {MONTH_NAMES.map((monthName) => (
             <option key={monthName} value={monthName}>
               {monthName}
+            </option>
+          ))}
+        </select>
+        <select
+          name="year"
+          defaultValue={month.year}
+          disabled={transition.state !== 'idle'}
+        >
+          {getValidYears().map((year) => (
+            <option key={year} value={year}>
+              {year}
             </option>
           ))}
         </select>

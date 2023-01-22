@@ -2,11 +2,15 @@ import type { MonthName } from './date-utils';
 import type { Measurement } from './types';
 import { db } from '~/utils/db.server';
 
-export const getCachedMeasurements = async (
-  month: MonthName
-): Promise<Measurement[] | undefined> => {
+export const getCachedMeasurements = async ({
+  month,
+  year,
+}: {
+  month: MonthName;
+  year: number;
+}): Promise<Measurement[] | undefined> => {
   const data = await db.measurement.findMany({
-    where: { month },
+    where: { month, year },
   });
   return data.map(
     ({ consumption, cost, from, to, unitPrice, unitPriceVAT }) => ({
@@ -21,10 +25,15 @@ export const getCachedMeasurements = async (
   );
 };
 
-export const saveCache = async (
-  month: MonthName,
-  measurements: Measurement[]
-) => {
+export const saveCache = async ({
+  measurements,
+  month,
+  year,
+}: {
+  month: MonthName;
+  measurements: Measurement[];
+  year: number;
+}) => {
   await db.measurement.deleteMany({
     where: { month },
   });
@@ -33,6 +42,7 @@ export const saveCache = async (
       data: {
         ...measurements[i],
         month,
+        year,
       },
     });
   }

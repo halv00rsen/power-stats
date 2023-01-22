@@ -101,10 +101,22 @@ const getMeasurements = async (
   return [];
 };
 
-const getDataForMonth = async (month: MonthName) => {
-  const query = buildConsumptionQuery(getMonthQueryInfo(month));
-  const cached = await getCachedMeasurements(month);
-  if (cached && cached.length > 0 && cacheIsUpToDate(month, cached)) {
+const getDataForMonth = async ({
+  month,
+  year,
+}: {
+  month: MonthName;
+  year: number;
+}) => {
+  const query = buildConsumptionQuery(
+    getMonthQueryInfo({ month, year })
+  );
+  const cached = await getCachedMeasurements({ month, year });
+  if (
+    cached &&
+    cached.length > 0 &&
+    cacheIsUpToDate({ month, measurements: cached, year })
+  ) {
     console.log(`Using cache for ${month}`);
     return cached;
   }
@@ -112,7 +124,7 @@ const getDataForMonth = async (month: MonthName) => {
   const measurements = (await getMeasurements(query)).filter(
     ({ cost, consumption }) => cost != null && consumption != null
   );
-  saveCache(month, measurements);
+  saveCache({ month, measurements, year });
 
   return measurements;
 };
@@ -120,12 +132,17 @@ const getDataForMonth = async (month: MonthName) => {
 export interface MonthConsumption {
   month: number;
   monthName: string;
+  year: number;
   measurements: Measurement[];
 }
 
-export async function getCurrentMonthConsumption(
-  monthName: MonthName
-): Promise<MonthConsumption> {
+export async function getCurrentMonthConsumption({
+  monthName,
+  year,
+}: {
+  monthName: MonthName;
+  year: number;
+}): Promise<MonthConsumption> {
   if (!accessKey) {
     throw new Response(
       'Server is misconfigured. Missing access token for Tibber',
@@ -135,6 +152,7 @@ export async function getCurrentMonthConsumption(
   return {
     month: getMonthIndex(monthName),
     monthName,
-    measurements: await getDataForMonth(monthName),
+    measurements: await getDataForMonth({ month: monthName, year }),
+    year,
   };
 }

@@ -7,35 +7,48 @@ import {
 import type { Measurement } from '../types';
 
 describe('getMonthQueryInfo', () => {
-  jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
-
   test('januar', () => {
-    const { after, numDays } = getMonthQueryInfo('januar');
+    const { after, numDays } = getMonthQueryInfo({
+      month: 'januar',
+      year: 2020,
+    });
     expect(numDays).toBe(31);
     expect(after.getFullYear()).toBe(2019);
     expect(after.getMonth()).toBe(getMonthIndex('desember'));
   });
 
   test('february with leap year', () => {
-    const { after, numDays } = getMonthQueryInfo('februar');
+    const { after, numDays } = getMonthQueryInfo({
+      month: 'februar',
+      year: 2020,
+    });
     expect(numDays).toBe(29);
     expect(after.getMonth()).toBe(getMonthIndex('januar'));
   });
 
   test('oktober', () => {
-    const { after, numDays } = getMonthQueryInfo('oktober');
+    const { after, numDays } = getMonthQueryInfo({
+      month: 'oktober',
+      year: 2020,
+    });
     expect(numDays).toBe(31);
     expect(after.getMonth()).toBe(getMonthIndex('september'));
   });
 
   test('november', () => {
-    const { after, numDays } = getMonthQueryInfo('november');
+    const { after, numDays } = getMonthQueryInfo({
+      month: 'november',
+      year: 2020,
+    });
     expect(numDays).toBe(30);
     expect(after.getMonth()).toBe(getMonthIndex('oktober'));
   });
 
   test('november', () => {
-    const { after, numDays } = getMonthQueryInfo('desember');
+    const { after, numDays } = getMonthQueryInfo({
+      month: 'desember',
+      year: 2020,
+    });
     expect(numDays).toBe(31);
     expect(after.getMonth()).toBe(getMonthIndex('november'));
   });
@@ -88,12 +101,22 @@ describe('cacheIsUpToDate', () => {
 
   test('has last measurement with length on list', () => {
     expect(
-      cacheIsUpToDate('desember', Array(24 * 31).fill(measurement))
+      cacheIsUpToDate({
+        month: 'desember',
+        measurements: Array(24 * 31).fill(measurement),
+        year: 2022,
+      })
     ).toBeTruthy();
   });
 
   test('cache is valid on last valid date of month', () => {
-    expect(cacheIsUpToDate('desember', [measurement])).toBeTruthy();
+    expect(
+      cacheIsUpToDate({
+        month: 'desember',
+        measurements: [measurement],
+        year: 2022,
+      })
+    ).toBeTruthy();
   });
 
   const measurement2: Measurement = {
@@ -105,13 +128,25 @@ describe('cacheIsUpToDate', () => {
     jest
       .useFakeTimers()
       .setSystemTime(new Date('2022-12-20:12:00.000+01:00'));
-    expect(cacheIsUpToDate('desember', [measurement2])).toBeTruthy();
+    expect(
+      cacheIsUpToDate({
+        month: 'desember',
+        measurements: [measurement2],
+        year: 2022,
+      })
+    ).toBeTruthy();
   });
 
   test('cache is invalid on two hours difference from last fetch', () => {
     jest
       .useFakeTimers()
       .setSystemTime(new Date('2022-12-20:13:00.000+01:00'));
-    expect(cacheIsUpToDate('desember', [measurement2])).toBeFalsy();
+    expect(
+      cacheIsUpToDate({
+        month: 'desember',
+        measurements: [measurement2],
+        year: 2022,
+      })
+    ).toBeFalsy();
   });
 });

@@ -32,12 +32,14 @@ export const isValidMonth = (month: string): month is MonthName => {
 // remove first entry from given month.
 // Example, oktober would yield 2022-09-30T23:00 instead of 2022-10-01T00:00
 // because of Tibbers API not including hour from the 'after' keyword
-export const getMonthQueryInfo = (
-  month: MonthName
-): { after: Date; numDays: number } => {
-  const current = new Date();
+export const getMonthQueryInfo = ({
+  month,
+  year,
+}: {
+  month: MonthName;
+  year: number;
+}): { after: Date; numDays: number } => {
   const monthIndex = getMonthIndex(month);
-  const year = current.getFullYear();
   if (monthIndex === MONTH_NAMES.indexOf('januar')) {
     return {
       after: new Date(`${year - 1}-12-31T23:00`),
@@ -48,7 +50,7 @@ export const getMonthQueryInfo = (
   const nextMonthNotPadded = monthIndex + 1;
   const daysInLastMonth = getDaysInMonth({
     monthNotZeroIndexed: lastMonthNotPadded,
-    year: year,
+    year,
   });
   const dateString =
     lastMonthNotPadded < 10
@@ -100,11 +102,16 @@ export function countUniqueDays(dates: Date[]): number {
   );
 }
 
-export const cacheIsUpToDate = (
-  month: MonthName,
-  measurements: Measurement[]
-): boolean => {
-  const { numDays } = getMonthQueryInfo(month);
+export const cacheIsUpToDate = ({
+  measurements,
+  month,
+  year,
+}: {
+  month: MonthName;
+  measurements: Measurement[];
+  year: number;
+}): boolean => {
+  const { numDays } = getMonthQueryInfo({ month, year });
   if (numDays * 24 === measurements.length) {
     return true;
   }

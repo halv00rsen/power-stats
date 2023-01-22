@@ -13,6 +13,7 @@ datasource db {
 model Measurement {
   id         String   @id @default(uuid())
   month String
+  year Int
 
   from String
   to String
