@@ -1,3 +1,4 @@
+import type { MonthName } from './date-utils';
 import type { Measurement, Month } from './types';
 
 export const TIBBER_FASTPRIS_KR = 39;
@@ -58,7 +59,13 @@ interface MontlyTotal extends Omit<Month, 'measurements'> {
   totalNettleie: UnitValue<'kroner'>;
 }
 
-export const getMonthlyInformation = (month: Month): MontlyTotal => {
+export const getMonthlyInformation = ({
+  month,
+  year,
+}: {
+  month: Month;
+  year: number;
+}): MontlyTotal => {
   const { measurements, month: monthNumber, monthName } = month;
   const initialMeasurement: Measurement = {
     consumption: 0,
@@ -82,6 +89,11 @@ export const getMonthlyInformation = (month: Month): MontlyTotal => {
     initialMeasurement
   );
 
+  const stromstotteConfig = getStromstotteConfig({
+    month: monthName,
+    year,
+  });
+
   const numEntries = measurements.length;
   const measurementAverage: Measurement = {
     ...measurementTotal,
@@ -96,9 +108,12 @@ export const getMonthlyInformation = (month: Month): MontlyTotal => {
   const spotprisUtenMva =
     spotprisMedMva - measurementAverage.unitPriceVAT;
   const stromstotte =
-    (spotprisUtenMva - 0.7) *
-    0.9 *
-    measurementAverage.consumption *
+    (spotprisUtenMva - stromstotteConfig.stotteFromKroner) *
+    stromstotteConfig.percentage *
+    Math.min(
+      measurementAverage.consumption,
+      stromstotteConfig.maxNumKwh
+    ) *
     1.25;
 
   const fastledd = getFastleddTrinn(month);
@@ -191,6 +206,7 @@ export const getMonthlyInformation = (month: Month): MontlyTotal => {
       visual: toKronerPostfix(totalNettleie),
       unit: 'kroner',
     },
+    year,
   };
 };
 
@@ -419,4 +435,67 @@ const getFastleddTrinn = (month: Month): Fastledd => {
     throw new Error('Could not find matching fastledd');
   }
   return trinn;
+};
+
+interface Stromstotte {
+  month: MonthName;
+  year: number;
+  percentage: number;
+  stotteFromKroner: number;
+  maxNumKwh: number;
+}
+
+export const getStromstotteConfig = ({
+  month,
+  year,
+}: {
+  month: MonthName;
+  year: number;
+}): Stromstotte => {
+  if (year === 2022) {
+    return {
+      month,
+      percentage: 0.9,
+      year,
+      stotteFromKroner: 0.7,
+      maxNumKwh: 5000,
+    };
+  } else if (year === 2023) {
+    switch (month) {
+      case 'april':
+      case 'mai':
+      case 'juni':
+      case 'juli':
+      case 'august':
+      case 'september':
+        return {
+          maxNumKwh: 5000,
+          month,
+          percentage: 0.8,
+          year,
+          stotteFromKroner: 0.7,
+        };
+      case 'januar':
+      case 'februar':
+      case 'mars':
+      case 'oktober':
+      case 'november':
+      case 'desember':
+      default:
+        return {
+          maxNumKwh: 5000,
+          month,
+          percentage: 0.9,
+          year,
+          stotteFromKroner: 0.7,
+        };
+    }
+  }
+  return {
+    maxNumKwh: 0,
+    month,
+    percentage: 0,
+    year,
+    stotteFromKroner: 0,
+  };
 };

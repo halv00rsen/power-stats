@@ -2,6 +2,7 @@ import type { Measurement, Month } from '~/utils/types';
 import type { LinksFunction } from '@remix-run/node';
 import {
   getMonthlyInformation,
+  getStromstotteConfig,
   TIBBER_FASTPRIS_KR,
   toKronerPostfix,
 } from '~/utils/strom-utils';
@@ -24,7 +25,7 @@ interface Props {
 }
 
 export const MonthComponent = ({ month }: Props) => {
-  const { monthName } = month;
+  const { monthName, year } = month;
 
   const {
     totalUsage: { consumption, cost },
@@ -34,7 +35,7 @@ export const MonthComponent = ({ month }: Props) => {
     stromstotte,
     totalCost,
     totalNettleie,
-  } = getMonthlyInformation(month);
+  } = getMonthlyInformation({ month, year });
 
   const numDaysCounted = countUniqueDays(
     month.measurements.map(({ from }) => new Date(from))
@@ -43,6 +44,11 @@ export const MonthComponent = ({ month }: Props) => {
   const lastRegisteredMeasurement = getLastRegisteredHour(
     month.measurements
   );
+
+  const stromstotteConfig = getStromstotteConfig({
+    month: monthName,
+    year,
+  });
 
   return (
     <div className="wrapper">
@@ -68,6 +74,12 @@ export const MonthComponent = ({ month }: Props) => {
 
       <section>
         <h3>Spotpriser</h3>
+        <p>
+          For {monthName} gis støtte på{' '}
+          {stromstotteConfig.percentage * 100}% av gjennomsnittlig
+          spotpris over {stromstotteConfig.stotteFromKroner * 100} øre
+          opptil et forbruk på {stromstotteConfig.maxNumKwh} kwh.
+        </p>
         <table className="spotpriser">
           <thead>
             <tr>

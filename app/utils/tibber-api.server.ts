@@ -131,7 +131,7 @@ const getDataForMonth = async ({
 
 export interface MonthConsumption {
   month: number;
-  monthName: string;
+  monthName: MonthName;
   year: number;
   measurements: Measurement[];
 }

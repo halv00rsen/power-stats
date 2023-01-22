@@ -1,3 +1,5 @@
+import type { MonthName } from './date-utils';
+
 export interface Measurement {
   from: string;
   to: string;
@@ -10,6 +12,7 @@ export interface Measurement {
 
 export interface Month {
   month: number;
-  monthName: string;
+  monthName: MonthName;
+  year: number;
   measurements: Measurement[];
 }
